@@ -37,10 +37,7 @@ def add():
         })
         data["last_id"] = post_id
 
-        with open("posts.json", "w", encoding="utf-8") as posts:
-            json.dump(data, posts)
-
-        return redirect(url_for('index'))
+        return save_data_and_redirect_to_index(data)
 
     return render_template('add.html')
 
@@ -82,14 +79,17 @@ def update(post_id):
         post['title'] = request.form['title']
         post['content'] = request.form['content']
 
-        # Save changes
-        with open("posts.json", "w", encoding="utf-8") as f:
-            json.dump(blog_posts, f)
-
-        return redirect(url_for('index'))
+        return save_data_and_redirect_to_index(blog_posts)
 
     return render_template('update.html', post=post)
 
+
+def save_data_and_redirect_to_index(data):
+    # Save changes
+    with open("posts.json", "w", encoding="utf-8") as f:
+        json.dump(data, f)
+
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
