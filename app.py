@@ -10,15 +10,10 @@ app = Flask(__name__)
 def index():
     with open("posts.json", "r", encoding="utf-8") as posts:
         blog_posts = json.load(posts)
-        print(posts)
 
     # add code here to fetch the job posts from a file
     return render_template('index.html', posts=blog_posts["posts"])
 
-# [
-#     {"id": 1, "author": "John Doe", "title": "First Post", "content": "This is my first post."},
-#     {"id": 2, "author": "Jane Doe", "title": "Second Post", "content": "This is another post."}
-# ]
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
