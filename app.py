@@ -13,7 +13,7 @@ def index():
         print(posts)
 
     # add code here to fetch the job posts from a file
-    return render_template('index.html', posts=blog_posts)
+    return render_template('index.html', posts=blog_posts["posts"])
 
 # [
 #     {"id": 1, "author": "John Doe", "title": "First Post", "content": "This is my first post."},
@@ -28,17 +28,22 @@ def add():
         content = request.form.get('content')
 
         with open("posts.json", "r", encoding="utf-8") as posts:
-            blog_posts = json.load(posts)
+            data = json.load(posts)
 
-        post_id = blog_posts[len(blog_posts) - 1]['id']
-        blog_posts.append({
+        if "last_id" not in data:
+            data["last_id"] = 0
+        post_id = data["last_id"] + 1
+
+        data["posts"].append({
             'author': author,
             'title': title,
             'content': content,
-            'id': post_id + 1
+            'id': post_id
         })
+        data["last_id"] = post_id
+
         with open("posts.json", "w", encoding="utf-8") as posts:
-            json.dump(blog_posts, posts)
+            json.dump(data, posts)
 
         return redirect(url_for('index'))
 
@@ -51,11 +56,11 @@ def delete(post_id):
         blog_posts = json.load(posts)
 
     index_to_delete = next(
-        (_idx for _idx, post in enumerate(blog_posts) if post['id'] == post_id),
+        (_idx for _idx, post in enumerate(blog_posts["posts"]) if post['id'] == post_id),
         None
     )
 
-    blog_posts.pop(index_to_delete)
+    blog_posts["posts"].pop(index_to_delete)
 
     with open("posts.json", "w", encoding="utf-8") as f:
         json.dump(blog_posts, f)
@@ -69,7 +74,7 @@ def update(post_id):
         blog_posts = json.load(posts)
 
     post = next(
-        (_post for _post in blog_posts if _post['id'] == post_id),
+        (_post for _post in blog_posts["posts"] if _post['id'] == post_id),
         None
     )
 
